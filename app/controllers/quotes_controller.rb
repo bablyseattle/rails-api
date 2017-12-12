@@ -1,7 +1,9 @@
 class QuotesController < ApplicationController
-
+require 'pry'
   def index
     @quotes = Quote.all
+    author = params[:author]
+    @quotes = Quote.search(author)
     json_response(@quotes)
   end
   def show
@@ -11,12 +13,16 @@ class QuotesController < ApplicationController
 
   def create
     @quote = Quote.create!(quote_params)
-    json_response(@quote)
+    json_response(@quote, :created)
   end
 
   def update
     @quote = Quote.find(params[:id])
-    @quote.update!(quote_params)
+    if @quote.update!(quote_params)
+      render status:200, json: {
+        message: "Your quote has been updated successfully."
+      }
+    end
   end
 
   def destroy
